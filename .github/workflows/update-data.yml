@@ -1,6 +1,7 @@
 # .github/workflows/update-data.yml
+# (Shiller CAPE 데이터만 자동 업데이트합니다)
 
-name: Update Macro Data
+name: Update Macro Data (Shiller CAPE Only)
 
 on:
   schedule:
@@ -11,7 +12,7 @@ permissions:
   contents: write      # git push를 위한 쓰기 권한
 
 jobs:
-  update-data-files:
+  update-cape-file:
     runs-on: ubuntu-latest
     
     steps:
@@ -25,36 +26,32 @@ jobs:
         with:
           r-version: 'latest'
 
-      # 3. R 패키지 의존성 설치
+      # 3. R 패키지 의존성 설치 (Shiller CAPE에 필요한 것만)
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          # --- 🚀🚀🚀 수정된 부분: 패키지 목록에서 주석(#)을 모두 제거 🚀🚀🚀 ---
           packages: |
             any::tidyverse
             any::lubridate
             any::readr
             any::readxl
+            any::rvest
+            any::httr
             any::Quandl
 
       # --- 4. Shiller CAPE 스크립트 실행 ---
+      # (update_cape.R은 혹시 모를 폴백 로직에 Quandl을 사용할 수 있으니 그대로 둡니다)
       - name: Run R script for Shiller CAPE
         env:
           QUANDL_API_KEY: ${{ secrets.QUANDL_API_KEY }}
         run: Rscript update_cape.R 
 
-      # --- 5. FINRA Margin Debt 스크립트 실행 ---
-      - name: Run R script for FINRA Margin Debt
-        env:
-          QUANDL_API_KEY: ${{ secrets.QUANDL_API_KEY }}
-        run: Rscript update_finra.R
-
-      # --- 6. 변경된 파일 모두 커밋 및 푸시 ---
-      - name: Commit updated files
+      # --- 5. 변경된 파일 커밋 및 푸시 ---
+      - name: Commit updated file (CAPE Only)
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "📈 Auto-update macro data (CAPE & FINRA)"
-          file_pattern: shiller_cape.csv finra_margin.csv 
+          commit_message: "📈 Auto-update Shiller CAPE data"
+          file_pattern: shiller_cape.csv # CAPE 파일만 커밋
           commit_user_name: "GitHub Action Bot"
           commit_user_email: "actions@github.com"
           commit_author: "GitHub Action Bot <actions@github.com>"
