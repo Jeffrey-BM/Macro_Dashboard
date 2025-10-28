@@ -39,7 +39,7 @@ jobs:
             any::rvest    # FINRA용
             any::httr     # FINRA용
 
-      # --- 4. Shiller CAPE 스크립트 실행 ---
+      # --- 4. Shiller CAPE 스크립트 실행 ----
       - name: Run R script for Shiller CAPE
         run: Rscript update_cape.R 
 
