@@ -7,7 +7,6 @@ on:
     - cron: '0 8 * * *'  # 매일 08:00 UTC에 실행
   workflow_dispatch:   # 수동 실행 버튼
 
-# 🚀🚀🚀 수정된 부분: permissions 블록을 on: 과 같은 레벨로 이동
 permissions:
   contents: write      # git push를 위한 쓰기 권한
 
@@ -30,7 +29,7 @@ jobs:
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          # 🚀🚀🚀 수정된 부분: packages 목록 들여쓰기 수정
+          # 🚀🚀🚀 이 부분의 들여쓰기를 정확하게 지켜주세요 🚀🚀🚀
           packages:
             any::tidyverse
             any::lubridate
@@ -39,7 +38,7 @@ jobs:
             any::rvest    # FINRA용
             any::httr     # FINRA용
 
-      # --- 4. Shiller CAPE 스크립트 실행 ----
+      # --- 4. Shiller CAPE 스크립트 실행 ---
       - name: Run R script for Shiller CAPE
         run: Rscript update_cape.R 
 
@@ -53,7 +52,7 @@ jobs:
         with:
           commit_message: "📈 Auto-update macro data (CAPE & FINRA)"
           # 두 개의 CSV 파일에 변경이 있을 경우 커밋
-          file_pattern: shiller_cape.csv finra_margin.csv 
+          file_pattern: shiller_csv shiller_cape.csv finra_margin.csv 
           commit_user_name: "GitHub Action Bot"
           commit_user_email: "actions@github.com"
           commit_author: "GitHub Action Bot <actions@github.com>"
