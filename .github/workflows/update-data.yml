@@ -6,7 +6,8 @@ on:
   schedule:
     - cron: '0 8 * * *'  # 매일 08:00 UTC에 실행
   workflow_dispatch:   # 수동 실행 버튼
-    
+
+# 🚀🚀🚀 수정된 부분: permissions 블록을 on: 과 같은 레벨로 이동
 permissions:
   contents: write      # git push를 위한 쓰기 권한
 
@@ -29,6 +30,7 @@ jobs:
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
+          # 🚀🚀🚀 수정된 부분: packages 목록 들여쓰기 수정
           packages:
             any::tidyverse
             any::lubridate
