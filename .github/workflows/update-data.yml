@@ -4,6 +4,30 @@ name: Update Macro Data
 
 # 1. 언제 실행할 것인가?
 on:
+
+name: Update Macro Data
+
+on:
+  schedule:
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+# 🚀🚀🚀 이 부분을 추가해 주세요 🚀🚀🚀
+permissions:
+  contents: write
+# 🚀🚀🚀 추가 끝 🚀🚀🚀
+
+jobs:
+  update-cape-file:
+    # (이하 내용은 동일합니다)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # (이하 내용 생략)
+      
   # (옵션 1) 매일 08:00 UTC (한국 시간 오후 5시)에 자동으로 실행
   schedule:
     - cron: '0 8 * * *'
