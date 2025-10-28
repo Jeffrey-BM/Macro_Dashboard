@@ -29,13 +29,14 @@ jobs:
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          packages:
+          # --- 🚀🚀🚀 수정된 부분: 패키지 목록을 한 줄로 변경 🚀🚀🚀 ---
+          packages: |
             any::tidyverse
             any::lubridate
             any::readr
-            any::readxl    # Shiller/FINRA용
-            any::rvest    # FINRA용
-            any::httr     # FINRA용
+            any::readxl
+            any::rvest
+            any::httr
 
       # --- 4. Shiller CAPE 스크립트 실행 ---
       - name: Run R script for Shiller CAPE
@@ -50,7 +51,6 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "📈 Auto-update macro data (CAPE & FINRA)"
-          # 'shiller_csv' 오타 제거
           file_pattern: shiller_cape.csv finra_margin.csv 
           commit_user_name: "GitHub Action Bot"
           commit_user_email: "actions@github.com"
