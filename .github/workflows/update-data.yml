@@ -1,0 +1,58 @@
+# .github/workflows/update-data.yml
+
+name: Update Macro Data
+
+# 1. 언제 실행할 것인가?
+on:
+  # (옵션 1) 매일 08:00 UTC (한국 시간 오후 5시)에 자동으로 실행
+  schedule:
+    - cron: '0 8 * * *'
+  
+  # (옵션 2) 수동으로 실행할 수 있도록 Actions 탭에 버튼 추가
+  workflow_dispatch:
+
+# 2. 무슨 작업을 할 것인가?
+jobs:
+  update-cape-file:
+    runs-on: ubuntu-latest # 작업 환경
+    
+    steps:
+      # 1. 리포지토리 코드 가져오기 (git checkout)
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # 2. R 언어 환경 설정
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'latest' # 최신 R 버전 사용
+
+      # 3. R 패키지 의존성 설치
+      - name: Install R dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages:
+            any::tidyverse
+            any::lubridate
+            any::httr
+            any::rvest
+            any::Quandl
+            any::readr
+
+      # 4. R 스크립트 실행 (API 키 주입)
+      - name: Run R script to fetch data
+        env:
+          # GitHub Secret을 환경 변수로 주입
+          QUANDL_API_KEY: ${{ secrets.QUANDL_API_KEY }}
+        run: Rscript update_cape.R # 1단계에서 만든 R 스크립트 실행
+
+      # 5. 변경된 파일 커밋하기
+      - name: Commit updated file
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "📈 Auto-update Shiller CAPE data"
+          file_pattern: shiller_cape.csv # 이 파일에 변경이 있을 때만 커밋
+          commit_user_name: "GitHub Action Bot"
+          commit_user_email: "actions@github.com"
+          commit_author: "GitHub Action Bot <actions@github.com>"
+          
