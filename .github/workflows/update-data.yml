@@ -29,33 +29,31 @@ jobs:
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          # 🚀🚀🚀 Quandl 패키지 추가 🚀🚀🚀
+          # --- 🚀🚀🚀 수정된 부분: 패키지 목록에서 주석(#)을 모두 제거 🚀🚀🚀 ---
           packages: |
             any::tidyverse
             any::lubridate
             any::readr
-            any::readxl    # For Shiller
-            any::Quandl    # For FINRA
+            any::readxl
+            any::Quandl
 
       # --- 4. Shiller CAPE 스크립트 실행 ---
       - name: Run R script for Shiller CAPE
         env:
-          # Quandl 키는 Shiller의 폴백 로직에도 필요할 수 있음
           QUANDL_API_KEY: ${{ secrets.QUANDL_API_KEY }}
         run: Rscript update_cape.R 
 
-      # --- 5. FINRA Margin Debt 스크립트 실행 (추가) ---
+      # --- 5. FINRA Margin Debt 스크립트 실행 ---
       - name: Run R script for FINRA Margin Debt
         env:
-          QUANDL_API_KEY: ${{ secrets.QUANDL_API_KEY }} # FINRA 스크립트에 API 키 주입
+          QUANDL_API_KEY: ${{ secrets.QUANDL_API_KEY }}
         run: Rscript update_finra.R
 
-      # --- 6. 변경된 파일 모두 커밋 (수정) ---
+      # --- 6. 변경된 파일 모두 커밋 및 푸시 ---
       - name: Commit updated files
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "📈 Auto-update macro data (CAPE & FINRA)"
-          # 🚀🚀🚀 finra_margin.csv 커밋 패턴 추가 🚀🚀🚀
           file_pattern: shiller_cape.csv finra_margin.csv 
           commit_user_name: "GitHub Action Bot"
           commit_user_email: "actions@github.com"
