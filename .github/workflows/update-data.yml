@@ -2,36 +2,28 @@
 
 name: Update Macro Data
 
-# 1. 언제 실행할 것인가?
 on:
-  # (옵션 1) 매일 08:00 UTC (한국 시간 오후 5시)에 자동으로 실행
   schedule:
     - cron: '0 8 * * *'
-  
-  # (옵션 2) 수동으로 실행할 수 있도록 Actions 탭에 버튼 추가
   workflow_dispatch:
 
-# 2. 쓰기 권한 부여 (git push를 위해 필수)
 permissions:
   contents: write
 
-# 3. 무슨 작업을 할 것인가?
 jobs:
-  update-cape-file:
-    runs-on: ubuntu-latest # 작업 환경
+  update-data-files: # Job 이름 변경
+    runs-on: ubuntu-latest
     
     steps:
-      # 1. 리포지토리 코드 가져오기 (git checkout)
       - name: Check out repository
         uses: actions/checkout@v4
 
-      # 2. R 언어 환경 설정
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
         with:
-          r-version: 'latest' # 최신 R 버전 사용
+          r-version: 'latest'
 
-      # 3. R 패키지 의존성 설치 (Shiller 엑셀 버전에 맞춤)
+      # 3. R 패키지 의존성 설치 (두 스크립트에 필요한 모든 패키지)
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
@@ -39,18 +31,25 @@ jobs:
             any::tidyverse
             any::lubridate
             any::readr
-            any::readxl    # <-- 엑셀 파일 읽기용
+            any::readxl    # For Shiller AND FINRA
+            any::rvest    # For FINRA
+            any::httr     # For FINRA
 
-      # 4. R 스크립트 실행 (API 키 불필요)
-      - name: Run R script to fetch data
-        run: Rscript update_cape.R # update_cape.R 스크립트 실행
+      # --- 4. Shiller CAPE 실행 ---
+      - name: Run R script for Shiller CAPE
+        run: Rscript update_cape.R 
 
-      # 5. 변경된 파일 커밋하기
-      - name: Commit updated file
+      # --- 5. FINRA Margin Debt 실행 (추가) ---
+      - name: Run R script for FINRA Margin Debt
+        run: Rscript update_finra.R
+
+      # --- 6. 변경된 파일 모두 커밋 (수정) ---
+      - name: Commit updated files
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "📈 Auto-update Shiller CAPE data"
-          file_pattern: shiller_cape.csv # 이 파일에 변경이 있을 때만 커밋
+          commit_message: "📈 Auto-update macro data (CAPE & FINRA)"
+          # 커밋할 파일 패턴에 finra_margin.csv 추가
+          file_pattern: shiller_cape.csv finra_margin.csv 
           commit_user_name: "GitHub Action Bot"
           commit_user_email: "actions@github.com"
           commit_author: "GitHub Action Bot <actions@github.com>"
