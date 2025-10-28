@@ -2,32 +2,8 @@
 
 name: Update Macro Data
 
-# 1. 언제 실행할 것인가? d
+# 1. 언제 실행할 것인가?
 on:
-
-name: Update Macro Data
-
-on:
-  schedule:
-    - cron: '0 8 * * *'
-  workflow_dispatch:
-
-# 🚀🚀🚀 이 부분을 추가해 주세요 🚀🚀🚀
-permissions:
-  contents: write
-# 🚀🚀🚀 추가 끝 🚀🚀🚀
-
-jobs:
-  update-cape-file:
-    # (이하 내용은 동일합니다)
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      # (이하 내용 생략)
-      
   # (옵션 1) 매일 08:00 UTC (한국 시간 오후 5시)에 자동으로 실행
   schedule:
     - cron: '0 8 * * *'
@@ -35,7 +11,11 @@ jobs:
   # (옵션 2) 수동으로 실행할 수 있도록 Actions 탭에 버튼 추가
   workflow_dispatch:
 
-# 2. 무슨 작업을 할 것인가?
+# 2. 쓰기 권한 부여 (git push를 위해 필수)
+permissions:
+  contents: write
+
+# 3. 무슨 작업을 할 것인가?
 jobs:
   update-cape-file:
     runs-on: ubuntu-latest # 작업 환경
@@ -51,24 +31,19 @@ jobs:
         with:
           r-version: 'latest' # 최신 R 버전 사용
 
-      # 3. R 패키지 의존성 설치
+      # 3. R 패키지 의존성 설치 (Shiller 엑셀 버전에 맞춤)
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           packages:
             any::tidyverse
             any::lubridate
-            any::httr
-            any::rvest
-            any::Quandl
             any::readr
+            any::readxl    # <-- 엑셀 파일 읽기용
 
-      # 4. R 스크립트 실행 (API 키 주입)
+      # 4. R 스크립트 실행 (API 키 불필요)
       - name: Run R script to fetch data
-        env:
-          # GitHub Secret을 환경 변수로 주입
-          QUANDL_API_KEY: ${{ secrets.QUANDL_API_KEY }}
-        run: Rscript update_cape.R # 1단계에서 만든 R 스크립트 실행
+        run: Rscript update_cape.R # update_cape.R 스크립트 실행
 
       # 5. 변경된 파일 커밋하기
       - name: Commit updated file
@@ -79,4 +54,3 @@ jobs:
           commit_user_name: "GitHub Action Bot"
           commit_user_email: "actions@github.com"
           commit_author: "GitHub Action Bot <actions@github.com>"
-          
