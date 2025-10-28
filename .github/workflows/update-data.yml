@@ -1,57 +1,38 @@
-# .github/workflows/update-data.yml
-
-name: Update Macro Data
+name: Update Macro Data (Shiller CAPE Only)
 
 on:
   schedule:
-    - cron: '0 8 * * *'  # 매일 08:00 UTC에 실행
-  workflow_dispatch:   # 수동 실행 버튼
+    - cron: '0 8 * * *'
+  workflow_dispatch:
 
 permissions:
-  contents: write      # git push를 위한 쓰기 권한
+  contents: write
 
 jobs:
-  update-data-files:
+  update-cape-file:
     runs-on: ubuntu-latest
-    
     steps:
-      # 1. 리포지토리 코드 가져오기
       - name: Check out repository
         uses: actions/checkout@v4
-
-      # 2. R 언어 환경 설정
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
         with:
           r-version: 'latest'
-
-      # 3. R 패키지 의존성 설치
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          # --- 🚀🚀🚀 수정된 부분: 패키지 목록을 한 줄로 변경 🚀🚀🚀 ---
-          packages: |
+          packages:
             any::tidyverse
             any::lubridate
             any::readr
-            any::readxl
-            any::rvest
-            any::httr
-
-      # --- 4. Shiller CAPE 스크립트 실행 ---
+            any::readxl    # Shiller CAPE용
       - name: Run R script for Shiller CAPE
         run: Rscript update_cape.R 
-
-      # --- 5. FINRA Margin Debt 스크립트 실행 ---
-      - name: Run R script for FINRA Margin Debt
-        run: Rscript update_finra.R
-
-      # --- 6. 변경된 파일 커밋 및 푸시 ---
-      - name: Commit updated files
+      - name: Commit updated file (CAPE Only)
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "📈 Auto-update macro data (CAPE & FINRA)"
-          file_pattern: shiller_cape.csv finra_margin.csv 
+          commit_message: "📈 Auto-update Shiller CAPE data"
+          file_pattern: shiller_cape.csv # CAPE 파일만 커밋
           commit_user_name: "GitHub Action Bot"
           commit_user_email: "actions@github.com"
           commit_author: "GitHub Action Bot <actions@github.com>"
