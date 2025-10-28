@@ -50,8 +50,8 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "📈 Auto-update macro data (CAPE & FINRA)"
-          # 두 개의 CSV 파일에 변경이 있을 경우 커밋
-          file_pattern: shiller_csv shiller_cape.csv finra_margin.csv 
+          # 'shiller_csv' 오타 제거
+          file_pattern: shiller_cape.csv finra_margin.csv 
           commit_user_name: "GitHub Action Bot"
           commit_user_email: "actions@github.com"
           commit_author: "GitHub Action Bot <actions@github.com>"
