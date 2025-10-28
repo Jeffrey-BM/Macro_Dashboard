@@ -11,7 +11,7 @@ permissions:
   contents: write
 
 jobs:
-  update-data-files: # Job 이름 변경
+  update-data-files:
     runs-on: ubuntu-latest
     
     steps:
@@ -23,10 +23,11 @@ jobs:
         with:
           r-version: 'latest'
 
-      # 3. R 패키지 의존성 설치 (두 스크립트에 필요한 모든 패키지)
+      # 3. R 패키지 의존성 설치
       - name: Install R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
+          # --- 🚀🚀🚀 이 부분의 들여쓰기가 중요합니다! 🚀🚀🚀 ---
           packages:
             any::tidyverse
             any::lubridate
@@ -34,6 +35,7 @@ jobs:
             any::readxl    # For Shiller AND FINRA
             any::rvest    # For FINRA
             any::httr     # For FINRA
+          # --- 🚀🚀🚀 여기까지 🚀🚀🚀 ---
 
       # --- 4. Shiller CAPE 실행 ---
       - name: Run R script for Shiller CAPE
@@ -53,3 +55,4 @@ jobs:
           commit_user_name: "GitHub Action Bot"
           commit_user_email: "actions@github.com"
           commit_author: "GitHub Action Bot <actions@github.com>"
+          
